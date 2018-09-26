@@ -10,7 +10,8 @@ public class ViewController : MonoBehaviour
 	private const string RedPlayerPrefabName = "Prefabs/RedPlayer";
 	private const string BluePlayerPrefabName = "Prefabs/BluePlayer";
 	private const string FootballPrefabName = "Prefabs/Football";
-	private const float AnimationDuration = 1f;
+	
+	[SerializeField] private float AnimationDuration = 1f;
 
 	[SerializeField] private Transform GridTransform;
 	[SerializeField] private Transform PlayersTransform;
@@ -83,7 +84,7 @@ public class ViewController : MonoBehaviour
 			blue.transform.parent = PlayersTransform;
 			red.transform.parent = PlayersTransform;
 
-			if (AnimatingPlayers)
+			if (UseAnimatedPlayers)
 			{
 				blue.GetComponent<ChangeColor>().ChangeMeshColor(Color.blue);
 				red.GetComponent<ChangeColor>().ChangeMeshColor(Color.red);
@@ -157,19 +158,28 @@ public class ViewController : MonoBehaviour
 		var newRedPosition = grid[height - 1 - redPlayer.newPosition.x, width - 1 - redPlayer.newPosition.y].transform.position;
 
 
-		AnimatingPlayers = true;
-		data = new AnimateData()
+		if (AnimationDuration == 0)
 		{
-			bluePlayer = blueTeam[bluePlayer.player],
-			oldBluePosition = oldBluePosition, 
-			newBluePosition = newBluePosition,
-			oldRedPosition = oldRedPosition,
-			newRedPosition = newRedPosition,
-			redPlayer = redTeam[redPlayer.player],
-			oldBallPosition = ball.transform.localPosition
-			
-		};
-		timer = 0f;
+			UpdatePlayerPositions(GameSimulator.BlueTeam, GameSimulator.RedTeam, GameSimulator.Ball, true);
+			GameSimulator.ReadyForNewRequest = true;
+		}
+		else
+		{
+
+			AnimatingPlayers = true;
+			data = new AnimateData()
+			{
+				bluePlayer = blueTeam[bluePlayer.player],
+				oldBluePosition = oldBluePosition,
+				newBluePosition = newBluePosition,
+				oldRedPosition = oldRedPosition,
+				newRedPosition = newRedPosition,
+				redPlayer = redTeam[redPlayer.player],
+				oldBallPosition = ball.transform.localPosition
+
+			};
+			timer = 0f;
+		}
 	}
 
 	public void UpdateBallOwner(FootballPlayer player, bool force = false)
